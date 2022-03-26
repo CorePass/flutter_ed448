@@ -74,7 +74,7 @@ See tests for examples of additional supported functionality
 dart --enable-asserts test/all.dart
 ```
 
-## License
+## Licensing
 
 `thirds` is licensed under the BSD 3-Clause License.
 
