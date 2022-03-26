@@ -76,7 +76,9 @@ dart --enable-asserts test/all.dart
 
 ## License
 
-`thirds` is dual-licensed under the BSD 3-Clause License and the Unlicense.
+`thirds` is licensed under the BSD 3-Clause License.
+
+Alternatively, `thirds` is available under the terms of the [UNLICENSE](https://unlicense.org/).
 
 ## Author
 
