@@ -1,4 +1,4 @@
-# threes
+# thirds
 
 SHA-3, BLAKE3, and EdDSA/Ed448 implementations in Dart, with EdDSA/Ed448 JWT support
 
@@ -6,12 +6,12 @@ SHA-3, BLAKE3, and EdDSA/Ed448 implementations in Dart, with EdDSA/Ed448 JWT sup
 
 With Dart:
 ```sh
-dart pub add threes
+dart pub add thirds
 ```
 
 With Flutter:
 ```sh
-flutter pub add threes
+flutter pub add thirds
 ```
 
 ## Examples
@@ -19,10 +19,10 @@ flutter pub add threes
 ```dart
 import 'dart:convert';
 
-import 'package:threes/sha3.dart';
-import 'package:threes/blake3.dart';
-import 'package:threes/ed448.dart' as ed448;
-import 'package:threes/jwt.dart';
+import 'package:thirds/sha3.dart';
+import 'package:thirds/blake3.dart';
+import 'package:thirds/ed448.dart' as ed448;
+import 'package:thirds/jwt.dart';
 
 main() {
   // SHA-3/Keccak
@@ -76,7 +76,7 @@ dart --enable-asserts test/all.dart
 
 ## License
 
-`threes` is dual-licensed under the BSD 3-Clause License and the Unlicense.
+`thirds` is dual-licensed under the BSD 3-Clause License and the Unlicense.
 
 ## Author
 

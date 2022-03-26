@@ -1,4 +1,4 @@
-name: threes
+name: thirds
 
 description: >-
   SHA-3, BLAKE3, and EdDSA/Ed448 implementations in Dart,
@@ -9,4 +9,4 @@ version: 0.1.0-alpha
 environment:
   sdk: '>=2.16.0 <3.0.0'
 
-repository: https://github.com/mnito/threes
+repository: https://github.com/mnito/thirds
