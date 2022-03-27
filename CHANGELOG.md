@@ -1,3 +1,7 @@
+# 0.1.0-alpha.4
+
+- Minor LICENSE copy change
+
 # 0.1.0-alpha.3
 
 - Minor README change in published version
