@@ -58,7 +58,17 @@ js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
 }
 
 main() {
-  js.context['Thirds'] = js.JsObject(js.context['Object']);
-  js.context['Thirds']['jwtEncode'] = jwtEncode;
-  js.context['Thirds']['jwtDecode'] = jwtDecode;
+  var thirds = {};;
+  thirds['jwtEncode'] = jwtEncode;
+  thirds['jwtDecode'] = jwtDecode;
+
+  var ctx = 'exports';
+  var isBrowser = !js.context.hasProperty('exports');
+  if (isBrowser) {
+      ctx = 'Thirds';
+      js.context[ctx] = js.JsObject(js.context['Object']);
+  }
+  thirds.forEach((key, value) {
+    js.context[ctx][key] = value;
+  });
 }

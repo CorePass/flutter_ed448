@@ -10,3 +10,5 @@ environment:
   sdk: '>=2.16.0 <3.0.0'
 
 repository: https://github.com/mnito/thirds
+dev_dependencies: 
+  node_preamble: ^2.0.1
