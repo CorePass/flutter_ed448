@@ -1,13 +1,41 @@
 import 'dart:js' as js;
 
-import '../lib/jwt.dart';
+import '../lib/jwt.dart' as jwt;
 
-ed448PublicKeyJwtDecode(String jwt, String publicKey) {
+String jwtEncode(js.JsObject data, String algorithm, js.JsObject key) {
+  if (algorithm != "EdDSA") {
+    throw UnsupportedError("jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
+  }
+
+  var m = new Map<String, dynamic>();
+
+  for (var k in js.context['Object'].callMethod('keys', [data])) {
+    m[k] = data[k];
+  }
+
+  return jwt.jwtEncode(
+    m,
+    algorithm: algorithm,
+    key: jwt.OkpPrivateKey.fromSecret("Ed448", key['key'])
+  );
+}
+
+js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
   var obj = js.JsObject(js.context['Object']);
-  var key = OkpPublicKey.fromPublic("Ed448", publicKey);
+
+  if (algorithm != "EdDSA") {
+    throw UnsupportedError("jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
+  }
+
+  var jwtKey;
+  if (key.hasProperty("public") && key['public']) {
+    jwtKey = jwt.OkpPublicKey.fromPublic("Ed448", key['key']);
+  } else {
+    jwtKey = jwt.OkpPrivateKey.fromSecret("Ed448", key['key']);
+  }
 
   try {
-    var decoded = jwtDecode(jwt, key: key, algorithm: "EdDSA");
+    var decoded = jwt.jwtDecode(token, key: jwtKey, algorithm: "EdDSA");
     obj["verified"] = true;
     obj["decoded"] = js.JsObject(js.context['Object']);
     decoded.forEach((key, value) {
@@ -17,8 +45,10 @@ ed448PublicKeyJwtDecode(String jwt, String publicKey) {
   } catch (e) {
     obj["verified"] = false;
     obj["decoded"] = null;
-    if (e is InvalidToken) {
-      obj["reason"] = e.toString().split(':')[0];
+    if (e is jwt.InvalidToken) {
+      obj["reason"] = e.toString().split(': ')[0];
+    } else if (e is UnsupportedError) {
+      obj["reason"] = e.toString().split(': ')[1];
     } else {
       obj["reason"] = "Unable to parse token";
     }
@@ -28,5 +58,7 @@ ed448PublicKeyJwtDecode(String jwt, String publicKey) {
 }
 
 main() {
-  js.context['ed448PublicKeyJwtDecode'] = ed448PublicKeyJwtDecode;
+  js.context['Thirds'] = js.JsObject(js.context['Object']);
+  js.context['Thirds']['jwtEncode'] = jwtEncode;
+  js.context['Thirds']['jwtDecode'] = jwtDecode;
 }
