@@ -1,4 +1,4 @@
-# 0.2.0-alpha.2
+# 0.2.0-alpha.1
 
 - Include previous version in changelog
 
