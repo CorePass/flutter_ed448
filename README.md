@@ -37,7 +37,7 @@ main() {
 
   // EdDSA/Ed448
   final secret = ed448.parseKeyString(
-    // Must be 114 bytes -- make sure to securely randomly generate for real
+    // Must be 57 bytes -- make sure to securely randomly generate for real
     "872d093780f5d3730df7c212664b37b8a0f24f56810daa8382cd4fa3f"
     "77634ec44dc54f1c2ed9bea86fafb7632d8be199ea165f5ad55dd9ce8"
   );
