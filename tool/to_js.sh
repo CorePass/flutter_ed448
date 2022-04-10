@@ -1,2 +1,2 @@
-dart2js --no-source-maps -O4 -o dist/thirds.min.js tool/js_main.dart
-(dart tool/print_node_preamble.dart | cat - dist/thirds.min.js) > dist/thirds.min.node.js
+dart2js --no-source-maps -O4 -o js/dist/thirds.min.js js/main.dart
+(dart js/print_node_preamble.dart | cat - js/dist/thirds.min.js) > js/dist/thirds.min.node.js

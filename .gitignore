@@ -1,6 +1,7 @@
+.DS_Store
 .dart_tool/
 .packages
 build/
 pubspec.lock
-dist/example.html
+js/dist/example.html
 *.min.js.deps
