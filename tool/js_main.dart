@@ -1,20 +1,19 @@
+import 'dart:convert';
 import 'dart:js' as js;
 
 import '../lib/jwt.dart' as jwt;
+
+dynamic _toDartValue(js.JsObject value) {
+  return json.decode(js.context['JSON'].callMethod('stringify', [value]));
+}
 
 String jwtEncode(js.JsObject data, String algorithm, js.JsObject key) {
   if (algorithm != "EdDSA") {
     throw UnsupportedError("jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
   }
 
-  var m = new Map<String, dynamic>();
-
-  for (var k in js.context['Object'].callMethod('keys', [data])) {
-    m[k] = data[k];
-  }
-
   return jwt.jwtEncode(
-    m,
+    _toDartValue(data),
     algorithm: algorithm,
     key: jwt.OkpPrivateKey.fromSecret("Ed448", key['key'])
   );
@@ -37,10 +36,7 @@ js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
   try {
     var decoded = jwt.jwtDecode(token, key: jwtKey, algorithm: "EdDSA");
     obj["verified"] = true;
-    obj["decoded"] = js.JsObject(js.context['Object']);
-    decoded.forEach((key, value) {
-      obj["decoded"][key] = value;
-    });
+    obj["decoded"] = js.JsObject.jsify(decoded);
     obj["reason"] = null;
   } catch (e) {
     obj["verified"] = false;
