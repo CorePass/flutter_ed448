@@ -4,7 +4,7 @@ description: >-
   SHA-3, BLAKE3, and EdDSA/Ed448 implementations in Dart,
   with EdDSA/Ed448 JWT support
 
-version: 0.1.0-alpha.4
+version: 0.2.0-alpha
 
 environment:
   sdk: '>=2.16.0 <3.0.0'
