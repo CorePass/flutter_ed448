@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:thirds/ed448.dart' as ed448;
-import 'package:thirds/jwt.dart';
+import 'package:core_ed448/ed448.dart' as ed448;
+import 'package:core_ed448/jwt.dart';
 
 int main(List<String> arguments) {
-  if(arguments.length <= 0) {
+  if (arguments.length <= 0) {
     print("Thirds");
     print("Try gen_key_pair and create_jwt");
     return 0;
@@ -17,10 +17,8 @@ int main(List<String> arguments) {
     var secret = List<int>.generate(57, (_) => random.nextInt(256));
     var public = ed448.secretToPublic(secret);
 
-    print(
-      "private key: ${ed448.toHexString(secret)}\n"
-      " public key: ${ed448.toHexString(public)}"
-    );
+    print("private key: ${ed448.toHexString(secret)}\n"
+        " public key: ${ed448.toHexString(public)}");
     return 0;
   }
 
@@ -46,13 +44,10 @@ int main(List<String> arguments) {
       return -1;
     }
 
-    print(
-      jwtEncode(
-        data,
+    print(jwtEncode(data,
         algorithm: "EdDSA",
-        key: OkpPrivateKey.fromSecret("Ed448", ed448.parseKeyString(secretAsHex))
-      )
-    );
+        key: OkpPrivateKey.fromSecret(
+            "Ed448", ed448.parseKeyString(secretAsHex))));
   }
 
   return 0;

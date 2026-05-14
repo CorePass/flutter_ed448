@@ -34,12 +34,9 @@ BigInt p = BigInt.two.pow(448) - BigInt.two.pow(224) - BigInt.one;
 
 BigInt d = BigInt.from(-39081);
 
-BigInt q = (
-  BigInt.two.pow(446)
-  - BigInt.parse(
-    '13818066809895115352007386748515426880336692474882178609894547503885'
-  )
-);
+BigInt q = (BigInt.two.pow(446) -
+    BigInt.parse(
+        '13818066809895115352007386748515426880336692474882178609894547503885'));
 
 List<BigInt> _pointAdd(List<BigInt> P, List<BigInt> Q) {
   final xcp = (P[0] * Q[0]) % p;
@@ -114,11 +111,11 @@ BigInt? _recoverX(BigInt y, BigInt sign) {
 
   // Calculate square root of x2
   var x = x2.modPow((p + BigInt.one) ~/ BigInt.from(4), p);
-  if ((x*x - x2) % p != BigInt.zero) {
+  if ((x * x - x2) % p != BigInt.zero) {
     x = x * _modpSqrtM1 % p;
   }
 
-  if ((x*x - x2) % p != BigInt.zero) {
+  if ((x * x - x2) % p != BigInt.zero) {
     return null;
   }
 
@@ -132,7 +129,7 @@ BigInt? _recoverX(BigInt y, BigInt sign) {
 List<int> _pointCompress(List<BigInt> P) {
   final zInv = P[2].modInverse(p);
   final x = P[0] * zInv % p;
-  final y  = P[1] * zInv % p;
+  final y = P[1] * zInv % p;
   return _toLE(y | ((x & BigInt.one) << 455), 57);
 }
 
@@ -149,16 +146,56 @@ List<BigInt>? _pointDecompress(List<int> s) {
 
   final x = _recoverX(y, sign);
   if (x == null) {
-      return null;
+    return null;
   }
 
   return [x, y, BigInt.one];
 }
 
-final _gY = BigInt.parse(
-  '0x693F46716EB6BC248876203756C9C7624BEA73736CA3984087789C1'
-  'E05A0C2D73AD3FF1CE67C39C4FDBD132C4ED7C8AD9808795BF230FA14'
-);
+bool _isAllZero(List<int> bytes) {
+  for (final byte in bytes) {
+    if (byte != 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool _constantTimeBytesEqual(List<int> a, List<int> b) {
+  if (a.length != b.length) {
+    return false;
+  }
+
+  var diff = 0;
+  for (var i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i];
+  }
+  return diff == 0;
+}
+
+final List<List<int>> _torsionEncodings = [
+  _toLE(BigInt.one, 57),
+  _toLE(p - BigInt.one, 57),
+  _toLE(BigInt.one << 455, 57),
+  _toLE(BigInt.zero, 57),
+];
+
+bool isTorsionPointEncoding(List<int> encodedPoint) {
+  if (encodedPoint.length != 57) {
+    throw FormatException("Invalid input length for torsion check");
+  }
+
+  for (final torsionEncoding in _torsionEncodings) {
+    if (_constantTimeBytesEqual(encodedPoint, torsionEncoding)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+final _gY =
+    BigInt.parse('0x693F46716EB6BC248876203756C9C7624BEA73736CA3984087789C1'
+        'E05A0C2D73AD3FF1CE67C39C4FDBD132C4ED7C8AD9808795BF230FA14');
 final _gX = _recoverX(_gY, BigInt.zero);
 final _G = [_gX!, _gY, BigInt.one];
 
@@ -225,8 +262,21 @@ String toHexString(List<int> bytes) {
 List<int> secretToPublic(List<int> secret) {
   final expanded = _secretExpand(secret);
   return UnmodifiableUint8ListView(
-    Uint8List.fromList(_pointCompress(_pointMultiply(expanded[0], _G)))
-  );
+      Uint8List.fromList(_pointCompress(_pointMultiply(expanded[0], _G))));
+}
+
+List<int> _clampedScalarBytes(List<int> scalar) {
+  if (scalar.length != 57) {
+    throw FormatException("Bad size of secret scalar");
+  }
+
+  return _clamp(<int>[]..addAll(scalar));
+}
+
+List<int> secretToPublicFromScalar(List<int> scalar) {
+  final a = _asLE(_clampedScalarBytes(scalar));
+  return UnmodifiableUint8ListView(
+      Uint8List.fromList(_pointCompress(_pointMultiply(a, _G))));
 }
 
 typedef ED448_XOF = List<int> Function(List<int> message, int outputLength);
@@ -237,12 +287,13 @@ BigInt _xofModQ(ED448_XOF xof, List<int> message, int outputLength) {
 
 final List<int> MARKER = ascii.encode('SigEd448');
 
-List<int> sign(List<int> secret, List<int> message, {ED448_XOF xof = shake_256}) {
+List<int> sign(List<int> secret, List<int> message,
+    {ED448_XOF xof = shake_256}) {
   final expanded = _secretExpand(secret);
   final a = expanded[0];
   final prefix = expanded[1];
   final A = _pointCompress(_pointMultiply(a, _G));
-  final r =  _xofModQ(xof, MARKER + [0] + [0] + prefix + message, 114);
+  final r = _xofModQ(xof, MARKER + [0] + [0] + prefix + message, 114);
   final R = _pointMultiply(r, _G);
   final Rs = _pointCompress(R);
   final h = _xofModQ(xof, MARKER + [0] + [0] + Rs + A + message, 114);
@@ -251,12 +302,35 @@ List<int> sign(List<int> secret, List<int> message, {ED448_XOF xof = shake_256})
   return UnmodifiableUint8ListView(Uint8List.fromList(Rs + _toLE(s, 57)));
 }
 
-bool verify(
-  List<int> public,
-  List<int> message,
-  List<int> signature,
-  {ED448_XOF xof = shake_256}
-) {
+List<int> signWithScalar(
+    List<int> scalar, List<int> noncePrefix, List<int> message,
+    {ED448_XOF xof = shake_256}) {
+  final A = secretToPublicFromScalar(scalar);
+  return signWithScalarAndPublic(scalar, noncePrefix, A, message, xof: xof);
+}
+
+List<int> signWithScalarAndPublic(List<int> scalar, List<int> noncePrefix,
+    List<int> public, List<int> message,
+    {ED448_XOF xof = shake_256}) {
+  if (noncePrefix.length != 57) {
+    throw FormatException("Bad size of nonce prefix");
+  }
+  if (public.length != 57) {
+    throw FormatException("Bad public key length");
+  }
+
+  final a = _asLE(_clampedScalarBytes(scalar));
+  final r = _xofModQ(xof, MARKER + [0] + [0] + noncePrefix + message, 114);
+  final R = _pointMultiply(r, _G);
+  final Rs = _pointCompress(R);
+  final h = _xofModQ(xof, MARKER + [0] + [0] + Rs + public + message, 114);
+  final s = (r + h * a) % q;
+
+  return UnmodifiableUint8ListView(Uint8List.fromList(Rs + _toLE(s, 57)));
+}
+
+bool verify(List<int> public, List<int> message, List<int> signature,
+    {ED448_XOF xof = shake_256}) {
   if (public.length != 57) {
     throw FormatException("Bad public key length");
   }
@@ -265,15 +339,22 @@ bool verify(
     throw FormatException("Bad signature length");
   }
 
+  final Rs = signature.sublist(0, 57);
+  if (_isAllZero(public) ||
+      _isAllZero(signature) ||
+      isTorsionPointEncoding(public) ||
+      isTorsionPointEncoding(Rs)) {
+    return false;
+  }
+
   final A = _pointDecompress(public);
   if (A == null) {
     return false;
   }
 
-  final Rs = signature.sublist(0, 57);
   final R = _pointDecompress(Rs);
   if (R == null) {
-      return false;
+    return false;
   }
 
   final s = _asLE(signature.sublist(57, 114));
