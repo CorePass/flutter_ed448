@@ -1,30 +1,35 @@
-# thirds
+# flutter_ed448
 
-SHA-3, BLAKE3, and EdDSA/Ed448 implementations in Dart, with EdDSA/Ed448 JWT support
+`flutter_ed448` is a Flutter-compatible Dart cryptography package that provides:
+
+- SHA-3 and SHAKE hashing helpers
+- BLAKE3 hashing
+- EdDSA/Ed448 signing and verification
+- Ed448-backed JWT encoding and decoding helpers
+
+The package is pure Dart, so it works in both Dart and Flutter projects.
 
 ## Installation
 
 With Dart:
 ```sh
-dart pub add thirds
+dart pub add flutter_ed448
 ```
 
 With Flutter:
 ```sh
-flutter pub add thirds
+flutter pub add flutter_ed448
 ```
 
-## Examples
+## Quick Start
 
 ```dart
 import 'dart:convert';
 
-import 'package:thirds/sha3.dart';
-import 'package:thirds/blake3.dart';
-import 'package:thirds/ed448.dart' as ed448;
-import 'package:thirds/jwt.dart';
+import 'package:flutter_ed448/flutter_ed448.dart';
+import 'package:flutter_ed448/ed448.dart' as ed448;
 
-main() {
+void main() {
   // SHA-3/Keccak
   sha3_224Hex(utf8.encode("abc"));
   // "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf"
@@ -66,24 +71,33 @@ main() {
 }
 ```
 
-See tests for examples of additional supported functionality
+See [test/core_ed448_test.dart](/Users/redqueen/Projects/flutter_ed448/test/core_ed448_test.dart) for compatibility vectors and edge-case coverage.
 
 ## Running Tests
 
 ```sh
-dart --enable-asserts test/all.dart
+dart test
+dart --enable-asserts run test/all.dart
 ```
+
+## Release Process
+
+```sh
+dart pub get
+dart analyze
+dart test
+dart --enable-asserts run test/all.dart
+dart pub publish --dry-run
+git tag v<version>
+git push origin v<version>
+```
+
+If `flutter_ed448` is being published to pub.dev for the first time, the initial release must still be published manually. After that, the included GitHub Actions release workflow can publish tagged versions automatically once pub.dev automated publishing is configured for this repository.
 
 ## Licensing
 
-`thirds` is licensed under the BSD 3-Clause License.
-
-Alternatively, `thirds` is available under the terms of the [UNLICENSE](https://unlicense.org/).
-
-## Author
-
-Michael P. Nitowski (Email: <mike@nitow.ski>)
+`flutter_ed448` is licensed under the BSD 3-Clause License.
 
 ## Contributing
 
-Contributions are welcome.
+Contributions are welcome. See [CONTRIBUTING.md](/Users/redqueen/Projects/flutter_ed448/CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](/Users/redqueen/Projects/flutter_ed448/CODE_OF_CONDUCT.md).

@@ -72,24 +72,23 @@ test() {
     final public = toHexString(publicBytes);
     assert(public == v[1], "Bad secret to public");
 
-    List<int> messageBytes = v[2] != '' ? _toBE(BigInt.parse('0x' + v[2]), v[2].length ~/ 2).toList() : [];
+    List<int> messageBytes = v[2] != ''
+        ? _toBE(BigInt.parse('0x' + v[2]), v[2].length ~/ 2).toList()
+        : [];
 
     final signature = sign(secret, messageBytes);
 
     print('signature: ${toHexString(signature)}');
 
-    assert(
-      toHexString(signature)
-      == v[3],
-      "Bad signature"
-    );
+    assert(toHexString(signature) == v[3], "Bad signature");
 
-    assert(verify(publicBytes, messageBytes, signature), "Signature verification failed");
+    assert(verify(publicBytes, messageBytes, signature),
+        "Signature verification failed");
+    assert(verify(parseKeyString(public), messageBytes, signature),
+        "Signature verification with parseKeyString(public) failed");
     assert(
-      verify(parseKeyString(public), messageBytes, signature),
-      "Signature verification with parseKeyString(public) failed"
-    );
-    assert(verify(publicBytes, messageBytes, signature.reversed.toList()) == false, "False signature verification");
+        verify(publicBytes, messageBytes, signature.reversed.toList()) == false,
+        "False signature verification");
   }
 
   assert(KEY_LENGTH == 57, "Bad key length constant");
@@ -98,30 +97,48 @@ test() {
   final secret = generateSecret();
   assert(secret.length == 57, "Secret key length check failed");
   final formattedSecret = toHexString(secret);
-  assert(formattedSecret.length == 114, "Formatted secret key length check failed");
+  assert(formattedSecret.length == 114,
+      "Formatted secret key length check failed");
 
   final public = secretToPublic(secret);
   assert(public.length == 57, "Public key length check failed");
   final formattedPublic = toHexString(public);
-  assert(formattedPublic.length == 114, "Formatted public key length check failed");
+  assert(formattedPublic.length == 114,
+      "Formatted public key length check failed");
 
   print('secret: $formattedSecret');
   print('public: $formattedPublic');
 
   final message = [
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+    0x00,
+    0x01,
+    0x02,
+    0x03,
+    0x04,
+    0x05,
+    0x06,
+    0x07,
+    0x08,
+    0x09,
+    0x0A,
+    0x0B,
+    0x0C,
+    0x0D,
+    0x0E,
+    0x0F
   ];
 
   final signature = sign(secret, message);
   assert(signature.length == 114, "Signature length check failed");
   final formattedSignature = toHexString(signature);
-  assert(formattedSignature.length == 228, "Formatted signature length check failed");
+  assert(formattedSignature.length == 228,
+      "Formatted signature length check failed");
 
   print('signature: ${toHexString(signature)}');
 
   assert(verify(public, message, signature), "Signature verification failed");
-  assert(verify(public, message.reversed.toList(), signature) == false, "False signature verification");
+  assert(verify(public, message.reversed.toList(), signature) == false,
+      "False signature verification");
 }
 
 main() {

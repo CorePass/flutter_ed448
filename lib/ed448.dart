@@ -239,7 +239,7 @@ List<int> generateSecret() {
     secret[i] = b;
   }
 
-  return UnmodifiableUint8ListView(secret);
+  return Uint8List.fromList(secret);
 }
 
 List<int> parseKeyString(String s) {
@@ -252,7 +252,7 @@ List<int> parseKeyString(String s) {
     l[i] = int.parse(s[i * 2] + s[i * 2 + 1], radix: 16);
   }
 
-  return UnmodifiableUint8ListView(l);
+  return Uint8List.fromList(l);
 }
 
 String toHexString(List<int> bytes) {
@@ -261,8 +261,7 @@ String toHexString(List<int> bytes) {
 
 List<int> secretToPublic(List<int> secret) {
   final expanded = _secretExpand(secret);
-  return UnmodifiableUint8ListView(
-      Uint8List.fromList(_pointCompress(_pointMultiply(expanded[0], _G))));
+  return Uint8List.fromList(_pointCompress(_pointMultiply(expanded[0], _G)));
 }
 
 List<int> _clampedScalarBytes(List<int> scalar) {
@@ -275,8 +274,7 @@ List<int> _clampedScalarBytes(List<int> scalar) {
 
 List<int> secretToPublicFromScalar(List<int> scalar) {
   final a = _asLE(_clampedScalarBytes(scalar));
-  return UnmodifiableUint8ListView(
-      Uint8List.fromList(_pointCompress(_pointMultiply(a, _G))));
+  return Uint8List.fromList(_pointCompress(_pointMultiply(a, _G)));
 }
 
 typedef ED448_XOF = List<int> Function(List<int> message, int outputLength);
@@ -299,7 +297,7 @@ List<int> sign(List<int> secret, List<int> message,
   final h = _xofModQ(xof, MARKER + [0] + [0] + Rs + A + message, 114);
   final s = (r + h * a) % q;
 
-  return UnmodifiableUint8ListView(Uint8List.fromList(Rs + _toLE(s, 57)));
+  return Uint8List.fromList(Rs + _toLE(s, 57));
 }
 
 List<int> signWithScalar(
@@ -326,7 +324,7 @@ List<int> signWithScalarAndPublic(List<int> scalar, List<int> noncePrefix,
   final h = _xofModQ(xof, MARKER + [0] + [0] + Rs + public + message, 114);
   final s = (r + h * a) % q;
 
-  return UnmodifiableUint8ListView(Uint8List.fromList(Rs + _toLE(s, 57)));
+  return Uint8List.fromList(Rs + _toLE(s, 57));
 }
 
 bool verify(List<int> public, List<int> message, List<int> signature,

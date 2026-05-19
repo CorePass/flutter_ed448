@@ -9,21 +9,21 @@ dynamic _toDartValue(js.JsObject value) {
 
 String jwtEncode(js.JsObject data, String algorithm, js.JsObject key) {
   if (algorithm != "EdDSA") {
-    throw UnsupportedError("jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
+    throw UnsupportedError(
+        "jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
   }
 
-  return jwt.jwtEncode(
-    _toDartValue(data),
-    algorithm: algorithm,
-    key: jwt.OkpPrivateKey.fromSecret("Ed448", key['key'])
-  );
+  return jwt.jwtEncode(_toDartValue(data),
+      algorithm: algorithm,
+      key: jwt.OkpPrivateKey.fromSecret("Ed448", key['key']));
 }
 
 js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
   var obj = js.JsObject(js.context['Object']);
 
   if (algorithm != "EdDSA") {
-    throw UnsupportedError("jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
+    throw UnsupportedError(
+        "jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
   }
 
   var jwtKey;
@@ -53,16 +53,16 @@ js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
   return obj;
 }
 
-main() {
-  var thirds = {};;
+void main() {
+  var thirds = {};
   thirds['jwtEncode'] = jwtEncode;
   thirds['jwtDecode'] = jwtDecode;
 
   var ctx = 'exports';
   var isBrowser = !js.context.hasProperty('exports');
   if (isBrowser) {
-      ctx = 'Thirds';
-      js.context[ctx] = js.JsObject(js.context['Object']);
+    ctx = 'Thirds';
+    js.context[ctx] = js.JsObject(js.context['Object']);
   }
   thirds.forEach((key, value) {
     js.context[ctx][key] = value;

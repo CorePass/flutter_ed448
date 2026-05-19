@@ -17,18 +17,19 @@ List<List<BigInt>> _KeccakF1600OnLanes(List<List<BigInt>> lanes) {
   for (int i = 0; i < 24; i++) {
     final List<BigInt> C = [];
     for (int x = 0; x < 5; x++) {
-      C.add(lanes[x][0] ^ lanes[x][1] ^ lanes[x][2] ^ lanes[x][3] ^ lanes[x][4]);
+      C.add(
+          lanes[x][0] ^ lanes[x][1] ^ lanes[x][2] ^ lanes[x][3] ^ lanes[x][4]);
     }
 
     final List<BigInt> D = [];
     for (int x = 0; x < 5; x++) {
-      D.add(C[(x+4) % 5] ^ _rotl64(C[(x + 1) % 5], 1));
+      D.add(C[(x + 4) % 5] ^ _rotl64(C[(x + 1) % 5], 1));
     }
 
     List<List<BigInt>> tempLanes = [];
     for (int x = 0; x < 5; x++) {
       tempLanes.add([]);
-      for(int y = 0; y < 5; y++) {
+      for (int y = 0; y < 5; y++) {
         tempLanes[x].add(lanes[x][y] ^ D[x]);
       }
     }
@@ -53,7 +54,7 @@ List<List<BigInt>> _KeccakF1600OnLanes(List<List<BigInt>> lanes) {
         T.add(lanes[x][y]);
       }
       for (int x = 0; x < 5; x++) {
-        lanes[x][y] = T[x] ^((~T[(x + 1) % 5]) & T[(x + 2) % 5]);
+        lanes[x][y] = T[x] ^ ((~T[(x + 1) % 5]) & T[(x + 2) % 5]);
       }
     }
 
@@ -79,7 +80,7 @@ BigInt _load64(List<BigInt> b) {
 List<BigInt> _store64(BigInt a) {
   final List<BigInt> b = [];
   for (int i = 0; i <= 7; i++) {
-    b.add((a >> (8*i)) % BigInt.from(256));
+    b.add((a >> (8 * i)) % BigInt.from(256));
   }
   return b;
 }
@@ -113,17 +114,12 @@ List<BigInt> _KeccakF1600(List<BigInt> state) {
   return newState;
 }
 
-List<int> _Keccak(
-  int rate,
-  int capacity,
-  List<int> inputBytes,
-  int delimitedSuffix,
-  int outputByteLength
-) {
+List<int> _Keccak(int rate, int capacity, List<int> inputBytes,
+    int delimitedSuffix, int outputByteLength) {
   List<BigInt> outputBytes = [];
 
   List<BigInt> state = [];
-  for (int _ = 0; _ < 200; _++) {
+  for (int i = 0; i < 200; i++) {
     state.add(BigInt.zero);
   }
 
@@ -135,7 +131,7 @@ List<int> _Keccak(
   }
 
   var inputOffset = 0;
-  while(inputOffset < inputBytes.length) {
+  while (inputOffset < inputBytes.length) {
     blockSize = min(inputBytes.length - inputOffset, rateInBytes);
     for (int i = 0; i < blockSize; i++) {
       state[i] = state[i] ^ BigInt.from(inputBytes[i + inputOffset]);
@@ -154,7 +150,7 @@ List<int> _Keccak(
   state[rateInBytes - 1] = state[rateInBytes - 1] ^ BigInt.from(0x80);
   state = _KeccakF1600(state);
 
-  while(outputByteLength > 0) {
+  while (outputByteLength > 0) {
     blockSize = min(outputByteLength, rateInBytes);
     outputBytes = outputBytes + state.sublist(0, blockSize);
     outputByteLength = outputByteLength - blockSize;
@@ -163,9 +159,7 @@ List<int> _Keccak(
     }
   }
 
-  return Uint8List.fromList(
-    List<int>.from(outputBytes.map((b) => b.toInt()))
-  );
+  return Uint8List.fromList(List<int>.from(outputBytes.map((b) => b.toInt())));
 }
 
 List<int> shake_128(List<int> inputBytes, int outputByteLength) {

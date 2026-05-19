@@ -1,10 +1,10 @@
-# thirds
+# flutter_ed448 JS Bridge
 
-EdDSA/Ed448 JWT support in JS
+This repository also includes a small JavaScript bridge for EdDSA/Ed448 JWT support.
 
 ## Including
 
-`thirds` can run in the browser and Node.js
+The generated bridge can run in the browser and Node.js.
 
 Web:
 
@@ -19,6 +19,8 @@ Node.js:
 ```js
 const Thirds = require("./dist/thirds.min.node.js");
 ```
+
+The generated bundle names still use the historical `thirds` prefix for compatibility with the existing JS build output.
 
 ## Examples
 

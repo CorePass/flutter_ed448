@@ -14,11 +14,14 @@ abstract class OkpKey extends Key {
   final String crv;
   final String x;
 
-  OkpKey({crv, x, kid}): this.crv = crv, this.x = x, super(kid);
+  OkpKey({crv, x, kid})
+      : this.crv = crv,
+        this.x = x,
+        super(kid);
 }
 
 class OkpPublicKey extends OkpKey {
-  OkpPublicKey({crv, x, kid}): super(crv: crv, x: x, kid: kid);
+  OkpPublicKey({crv, x, kid}) : super(crv: crv, x: x, kid: kid);
 
   factory OkpPublicKey._ed448FromPublic(dynamic public, [kid]) {
     public = public is List<int> ? public : ed448.parseKeyString(public);
@@ -27,11 +30,7 @@ class OkpPublicKey extends OkpKey {
       throw FormatException("Ed448 key length must be 57");
     }
 
-    return OkpPublicKey(
-      crv: 'Ed448',
-      x: base64Url.encode(public),
-      kid: kid
-    );
+    return OkpPublicKey(crv: 'Ed448', x: base64Url.encode(public), kid: kid);
   }
 
   factory OkpPublicKey.fromPublic(String curve, dynamic public, {kid}) {
@@ -46,20 +45,22 @@ class OkpPublicKey extends OkpKey {
 class OkpPrivateKey extends OkpKey {
   final String d;
 
-  OkpPrivateKey({crv, x, d, kid}): this.d = d, super(crv: crv, x: x, kid: kid);
+  OkpPrivateKey({crv, x, d, kid})
+      : this.d = d,
+        super(crv: crv, x: x, kid: kid);
 
   factory OkpPrivateKey._ed448FromSecret(dynamic secret, [kid]) {
     secret = secret is List<int> ? secret : ed448.parseKeyString(secret);
 
-      if (secret.length != 57) {
-        throw FormatException("Ed448 key length must be 57");
-      }
-      return OkpPrivateKey(
-        crv: 'Ed448',
-        x: base64Url.encode(ed448.secretToPublic(secret)),
-        d: base64Url.encode(secret),
-        kid: kid,
-      );
+    if (secret.length != 57) {
+      throw FormatException("Ed448 key length must be 57");
+    }
+    return OkpPrivateKey(
+      crv: 'Ed448',
+      x: base64Url.encode(ed448.secretToPublic(secret)),
+      d: base64Url.encode(secret),
+      kid: kid,
+    );
   }
 
   factory OkpPrivateKey.fromSecret(String curve, dynamic secret, [kid]) {
@@ -77,7 +78,7 @@ class InvalidToken implements Exception {
 
   InvalidToken._(this.type, this.message);
 
-  InvalidToken(message): this._('InvalidToken', message);
+  InvalidToken(message) : this._('InvalidToken', message);
 
   @override
   toString() {
@@ -86,19 +87,19 @@ class InvalidToken implements Exception {
 }
 
 class InvalidSignature extends InvalidToken {
-  InvalidSignature(message): super._('InvalidSignature', message);
+  InvalidSignature(message) : super._('InvalidSignature', message);
 }
 
 class NotYetValidToken extends InvalidToken {
-  NotYetValidToken(message): super._('NotYetValidToken', message);
+  NotYetValidToken(message) : super._('NotYetValidToken', message);
 }
 
 class ExpiredToken extends InvalidToken {
-  ExpiredToken(message): super._('ExpiredToken', message);
+  ExpiredToken(message) : super._('ExpiredToken', message);
 }
 
 class MalformedClaim extends InvalidToken {
-  MalformedClaim(message): super._('MalformedClaim', message);
+  MalformedClaim(message) : super._('MalformedClaim', message);
 }
 
 String _encode(Map<String, dynamic> m) {
@@ -121,12 +122,10 @@ String _ed448JwtEncode(Map<String, dynamic> data, OkpPrivateKey privateKey) {
   final signingInput = '$header.$payload';
 
   final signature = base64Url.encode(
-    ed448.sign(base64Url.decode(privateKey.d), utf8.encode(signingInput))
-  );
+      ed448.sign(base64Url.decode(privateKey.d), utf8.encode(signingInput)));
 
   return '$signingInput.$signature';
 }
-
 
 Map<String, dynamic> _ed448JwtDecode(String jwt, OkpKey key) {
   final header = _decode(jwt.substring(0, jwt.indexOf('.')));
@@ -136,9 +135,7 @@ Map<String, dynamic> _ed448JwtDecode(String jwt, OkpKey key) {
   }
 
   if (header['alg'] != 'EdDSA') {
-    throw UnsupportedError(
-      "Algorithm must be EdDSA in Ed448 decoding context"
-    );
+    throw UnsupportedError("Algorithm must be EdDSA in Ed448 decoding context");
   }
 
   final public = base64.decode(key.x);
@@ -149,12 +146,14 @@ Map<String, dynamic> _ed448JwtDecode(String jwt, OkpKey key) {
     throw InvalidSignature("Failed to verify JWT signature");
   }
 
-  final data = _decode(jwt.substring(jwt.indexOf('.') + 1, jwt.lastIndexOf('.')));
+  final data =
+      _decode(jwt.substring(jwt.indexOf('.') + 1, jwt.lastIndexOf('.')));
 
   return data;
 }
 
-String jwtEncode(Map<String, dynamic> data, {required String algorithm, required Key key}) {
+String jwtEncode(Map<String, dynamic> data,
+    {required String algorithm, required Key key}) {
   _coerceAndValidateNumericDateIfPresent(String claim) {
     if (!data.containsKey(claim)) {
       return;
@@ -184,8 +183,7 @@ String jwtEncode(Map<String, dynamic> data, {required String algorithm, required
 
     if (key.crv != 'Ed448') {
       throw UnsupportedError(
-        "jwtEncode using the EdDSA algorithm currently only supports Ed448"
-      );
+          "jwtEncode using the EdDSA algorithm currently only supports Ed448");
     }
 
     return _ed448JwtEncode(data, key);
@@ -194,7 +192,8 @@ String jwtEncode(Map<String, dynamic> data, {required String algorithm, required
   }
 }
 
-void _validateClaims(Map<String, dynamic> data, {dtLeeway = const Duration(seconds: 0)}) {
+void _validateClaims(Map<String, dynamic> data,
+    {dtLeeway = const Duration(seconds: 0)}) {
   if (data.containsKey('iat') && !(data['iat'] is int)) {
     throw MalformedClaim("Claim \"iat\" is not a NumericDate");
   }
@@ -204,7 +203,8 @@ void _validateClaims(Map<String, dynamic> data, {dtLeeway = const Duration(secon
       throw MalformedClaim("Claim \"nbf\" is not a NumericDate");
     }
 
-    final nbf = DateTime.fromMillisecondsSinceEpoch(data['nbf'] * 1000, isUtc: true);
+    final nbf =
+        DateTime.fromMillisecondsSinceEpoch(data['nbf'] * 1000, isUtc: true);
     if (DateTime.now().toUtc().compareTo(nbf.subtract(dtLeeway)) < 0) {
       throw NotYetValidToken("Token is not yet valid based on \"nbf\" claim");
     }
@@ -215,7 +215,8 @@ void _validateClaims(Map<String, dynamic> data, {dtLeeway = const Duration(secon
       throw MalformedClaim("Claim \"exp\" is not a NumericDate");
     }
 
-    final exp = DateTime.fromMillisecondsSinceEpoch(data['exp'] * 1000, isUtc: true);
+    final exp =
+        DateTime.fromMillisecondsSinceEpoch(data['exp'] * 1000, isUtc: true);
     if (DateTime.now().toUtc().compareTo(exp.add(dtLeeway)) >= 0) {
       throw ExpiredToken("Token is expired based on \"exp\" claim");
     }
@@ -226,7 +227,8 @@ Map<String, dynamic> jwtDecodeUnverifiedHeader(String jwt) {
   return _decode(jwt.substring(0, jwt.indexOf('.')));
 }
 
-Map<String, dynamic> jwtDecode(String jwt, {required String algorithm, required Key key}) {
+Map<String, dynamic> jwtDecode(String jwt,
+    {required String algorithm, required Key key}) {
   Map<String, dynamic>? decoded;
 
   if (algorithm == 'EdDSA') {
@@ -236,8 +238,7 @@ Map<String, dynamic> jwtDecode(String jwt, {required String algorithm, required 
 
     if (key.crv != 'Ed448') {
       throw UnsupportedError(
-        "jwtDecode using the EdDSA algorithm currently only supports Ed448"
-      );
+          "jwtDecode using the EdDSA algorithm currently only supports Ed448");
     }
 
     decoded = _ed448JwtDecode(jwt, key);
