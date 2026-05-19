@@ -24,8 +24,14 @@ final _FLAG_ROOT = 1 << 3;
 final _MAX_WORD_SIZE = 0xffffffff;
 
 final _IV = Uint32List.fromList([
-  0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-  0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+  0x6a09e667,
+  0xbb67ae85,
+  0x3c6ef372,
+  0xa54ff53a,
+  0x510e527f,
+  0x9b05688c,
+  0x1f83d9ab,
+  0x5be0cd19
 ]);
 
 int _ROTR32(int x, int y) => (((x) >> (y)) ^ ((x) << (32 - (y))));
@@ -88,23 +94,18 @@ final _SIGMA = [
 ];
 
 void _round(Uint32List state, Uint32List msg, int round) {
-  _G(state, 0, 4,  8, 12, msg[_SIGMA[round][0]], msg[_SIGMA[round][1]]);
-  _G(state, 1, 5,  9, 13, msg[_SIGMA[round][2]], msg[_SIGMA[round][3]]);
+  _G(state, 0, 4, 8, 12, msg[_SIGMA[round][0]], msg[_SIGMA[round][1]]);
+  _G(state, 1, 5, 9, 13, msg[_SIGMA[round][2]], msg[_SIGMA[round][3]]);
   _G(state, 2, 6, 10, 14, msg[_SIGMA[round][4]], msg[_SIGMA[round][5]]);
   _G(state, 3, 7, 11, 15, msg[_SIGMA[round][6]], msg[_SIGMA[round][7]]);
   _G(state, 0, 5, 10, 15, msg[_SIGMA[round][8]], msg[_SIGMA[round][9]]);
   _G(state, 1, 6, 11, 12, msg[_SIGMA[round][10]], msg[_SIGMA[round][11]]);
-  _G(state, 2, 7,  8, 13, msg[_SIGMA[round][12]], msg[_SIGMA[round][13]]);
-  _G(state, 3, 4,  9, 14, msg[_SIGMA[round][14]], msg[_SIGMA[round][15]]);
+  _G(state, 2, 7, 8, 13, msg[_SIGMA[round][12]], msg[_SIGMA[round][13]]);
+  _G(state, 3, 4, 9, 14, msg[_SIGMA[round][14]], msg[_SIGMA[round][15]]);
 }
 
-Uint32List _compressFirst8(
-  Uint32List cv,
-  Uint32List blockWords,
-  int counter,
-  int blockLength,
-  int flags
-) {
+Uint32List _compressFirst8(Uint32List cv, Uint32List blockWords, int counter,
+    int blockLength, int flags) {
   final state = Uint32List(16);
 
   state[0] = cv[0];
@@ -144,13 +145,8 @@ Uint32List _compressFirst8(
   return state;
 }
 
-Uint32List _compress(
-  Uint32List cv,
-  Uint32List blockWords,
-  int counter,
-  int blockLength,
-  int flags
-) {
+Uint32List _compress(Uint32List cv, Uint32List blockWords, int counter,
+    int blockLength, int flags) {
   final state = _compressFirst8(cv, blockWords, counter, blockLength, flags);
 
   state[8] = state[8] ^ cv[0];
@@ -172,23 +168,13 @@ class _Output {
   int blockLength;
   int flags;
 
-  _Output(
-    this.inputCv,
-    this.blockWords,
-    this.counter,
-    this.blockLength,
-    this.flags
-  );
+  _Output(this.inputCv, this.blockWords, this.counter, this.blockLength,
+      this.flags);
 }
 
 Uint32List _getChainingValue(_Output o) {
   final compressed = _compressFirst8(
-    o.inputCv,
-    o.blockWords,
-    o.counter,
-    o.blockLength,
-    o.flags
-  );
+      o.inputCv, o.blockWords, o.counter, o.blockLength, o.flags);
 
   return Uint32List.view(compressed.buffer, 0, 8);
 }
@@ -201,11 +187,7 @@ class _ChunkState {
   int blocksCompressed = 0;
   int flags;
 
-  _ChunkState(
-    this.cv,
-    this.chunkCounter,
-    this.flags
-  );
+  _ChunkState(this.cv, this.chunkCounter, this.flags);
 }
 
 int _chunkLength(_ChunkState chunk) {
@@ -221,14 +203,15 @@ void _chunkUpdate(_ChunkState chunk, Uint8List input) {
       final blockWords = _blockBytesToWords(chunk.block);
 
       chunk.cv = Uint32List.view(
-        _compressFirst8(
-          chunk.cv,
-          blockWords,
-          chunk.chunkCounter,
-          _BLOCK_LENGTH,
-          chunk.flags | (chunk.blocksCompressed == 0 ? _FLAG_CHUNK_START : 0),
-        ).buffer, 0, 8
-      );
+          _compressFirst8(
+            chunk.cv,
+            blockWords,
+            chunk.chunkCounter,
+            _BLOCK_LENGTH,
+            chunk.flags | (chunk.blocksCompressed == 0 ? _FLAG_CHUNK_START : 0),
+          ).buffer,
+          0,
+          8);
 
       chunk.blocksCompressed++;
       // Clear block
@@ -250,16 +233,13 @@ void _chunkUpdate(_ChunkState chunk, Uint8List input) {
 _Output _chunkOutput(_ChunkState chunk) {
   final blockWords = _blockBytesToWords(chunk.block);
   return _Output(
-    chunk.cv,
-    blockWords,
-    chunk.chunkCounter,
-    chunk.blockLength,
-    (
-      chunk.flags
-      | (chunk.blocksCompressed == 0 ? _FLAG_CHUNK_START : 0)
-      | _FLAG_CHUNK_END
-    )
-  );
+      chunk.cv,
+      blockWords,
+      chunk.chunkCounter,
+      chunk.blockLength,
+      (chunk.flags |
+          (chunk.blocksCompressed == 0 ? _FLAG_CHUNK_START : 0) |
+          _FLAG_CHUNK_END));
 }
 
 _Output _parentOutput(
@@ -282,8 +262,7 @@ Uint32List _parentCv(
   int flags,
 ) {
   return _getChainingValue(
-    _parentOutput(leftChildCv, rightChildCv, key, flags)
-  );
+      _parentOutput(leftChildCv, rightChildCv, key, flags));
 }
 
 class _HashContext {
@@ -293,9 +272,12 @@ class _HashContext {
   int _cvStackLength = 0;
   int _flags;
 
-  _HashContext._(key, flags) : _key = Uint32List.fromList(key), chunk = _ChunkState(key, 0, flags), _flags = flags;
+  _HashContext._(key, flags)
+      : _key = Uint32List.fromList(key),
+        chunk = _ChunkState(key, 0, flags),
+        _flags = flags;
 
-  _HashContext(): this._(_IV, 0);
+  _HashContext() : this._(_IV, 0);
 
   void reset() {
     this.chunk = _ChunkState(this._key, 0, this._flags);
@@ -312,7 +294,7 @@ class _HashContext {
   }
 
   _addChunkCv(Uint32List newCv, int totalChunks) {
-    while(totalChunks & 1 == 0) {
+    while (totalChunks & 1 == 0) {
       newCv = _parentCv(this._popCv(), newCv, this._key, this._flags);
       totalChunks >>= 1;
     }
@@ -331,10 +313,8 @@ class _HashContext {
       }
 
       final take = min(_CHUNK_LENGTH - _chunkLength(chunk), input.length);
-      _chunkUpdate(
-        this.chunk,
-        Uint8List.view(input.buffer, taken, min(take, input.length - taken))
-      );
+      _chunkUpdate(this.chunk,
+          Uint8List.view(input.buffer, taken, min(take, input.length - taken)));
       taken += take;
     }
   }
@@ -346,23 +326,14 @@ class _HashContext {
     int parentNodesRemaining = this._cvStackLength;
     while (parentNodesRemaining > 0) {
       parentNodesRemaining--;
-      o = _parentOutput(
-        this._cVStack[parentNodesRemaining]!,
-        _getChainingValue(o),
-        this._key,
-        this._flags
-      );
+      o = _parentOutput(this._cVStack[parentNodesRemaining]!,
+          _getChainingValue(o), this._key, this._flags);
     }
 
     int outputBlockCounter = 0;
     for (int i = 0; i < output.length; i += 2 * _OUT_LENGTH) {
-      final words = _compress(
-        o.inputCv,
-        o.blockWords,
-        outputBlockCounter,
-        o.blockLength,
-        o.flags | _FLAG_ROOT
-      );
+      final words = _compress(o.inputCv, o.blockWords, outputBlockCounter,
+          o.blockLength, o.flags | _FLAG_ROOT);
 
       int j = 0;
       for (final word in words) {

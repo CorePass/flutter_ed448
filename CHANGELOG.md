@@ -1,6 +1,11 @@
-# 0.2.0-alpha.1
+# 0.2.0
 
-- Include previous version in changelog
+- Prepare the package for release as `flutter_ed448`
+- Align repository metadata, installation instructions, and package examples
+- Add GitHub Actions workflows for CI validation and tagged releases
+- Fix Dart 3 compatibility issues in the hashing and Ed448 implementations
+- Add a package barrel export and executable alias for `flutter_ed448`
+- Update `pointycastle` to the latest 4.x release
 
 # 0.2.0-alpha
 
@@ -22,4 +27,4 @@
 
 # 0.1.0-alpha
 
-Initial release
+- Initial release

@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:core_ed448/ed448.dart' as ed448;
-import 'package:core_ed448/jwt.dart';
+import 'package:flutter_ed448/ed448.dart' as ed448;
+import 'package:flutter_ed448/jwt.dart';
 
 int main(List<String> arguments) {
   if (arguments.length <= 0) {
-    print("Thirds");
+    print("flutter_ed448");
     print("Try gen_key_pair and create_jwt");
     return 0;
   }
