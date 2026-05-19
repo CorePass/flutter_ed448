@@ -1,4 +1,4 @@
 export 'blake3.dart';
-export 'core_ed448.dart';
+export 'flutter_ed448_core.dart';
 export 'jwt.dart';
 export 'sha3.dart';

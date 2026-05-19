@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:flutter_ed448/core_ed448.dart' as core;
+import 'package:flutter_ed448/flutter_ed448_core.dart' as core;
 import 'package:test/test.dart';
 
 Uint8List hexToBytes(String hex) {

@@ -176,15 +176,15 @@ class Ed448HDWallet {
   }
 
   Uint8List ed448GenerateKey() {
-    return coreEd448GenerateKey();
+    return flutterEd448GenerateKey();
   }
 
   Uint8List ed448DerivePublicKey(Uint8List privateKeyBytes) {
-    return coreEd448DerivePublicKey(privateKeyBytes);
+    return flutterEd448DerivePublicKey(privateKeyBytes);
   }
 
   Uint8List ed448Sign(Uint8List privateKeyBytes, Uint8List message) {
-    return coreEd448Sign(privateKeyBytes, message);
+    return flutterEd448Sign(privateKeyBytes, message);
   }
 
   bool ed448Verify(
@@ -192,21 +192,21 @@ class Ed448HDWallet {
     Uint8List message,
     Uint8List signature,
   ) {
-    return coreEd448Verify(publicKeyBytes, message, signature);
+    return flutterEd448Verify(publicKeyBytes, message, signature);
   }
 }
 
-Uint8List coreEd448GenerateKey() => ed448GenerateKey();
+Uint8List flutterEd448GenerateKey() => ed448GenerateKey();
 
-Uint8List coreEd448DerivePublicKey(Uint8List privateKey) {
+Uint8List flutterEd448DerivePublicKey(Uint8List privateKey) {
   return ed448DerivePublicKey(privateKey);
 }
 
-Uint8List coreEd448Sign(Uint8List privateKey, Uint8List message) {
+Uint8List flutterEd448Sign(Uint8List privateKey, Uint8List message) {
   return ed448Sign(privateKey, message);
 }
 
-bool coreEd448Verify(
+bool flutterEd448Verify(
   Uint8List publicKey,
   Uint8List message,
   Uint8List signature,
