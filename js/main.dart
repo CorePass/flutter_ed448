@@ -1,70 +1,82 @@
 import 'dart:convert';
-import 'dart:js' as js;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import '../lib/jwt.dart' as jwt;
 
-dynamic _toDartValue(js.JsObject value) {
-  return json.decode(js.context['JSON'].callMethod('stringify', [value]));
+JSObject _globalObject() {
+	final exports = globalContext['exports'];
+	if (exports != null) {
+		return exports as JSObject;
+	}
+
+	final thirds = JSObject();
+	globalContext['Thirds'] = thirds;
+	return thirds;
 }
 
-String jwtEncode(js.JsObject data, String algorithm, js.JsObject key) {
-  if (algorithm != "EdDSA") {
-    throw UnsupportedError(
-        "jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
-  }
-
-  return jwt.jwtEncode(_toDartValue(data),
-      algorithm: algorithm,
-      key: jwt.OkpPrivateKey.fromSecret("Ed448", key['key']));
+dynamic _toDartValue(JSObject value) {
+	final jsonObject = globalContext['JSON'] as JSObject;
+	final stringified = jsonObject.callMethod<JSString>('stringify'.toJS, value);
+	return json.decode(stringified.toDart);
 }
 
-js.JsObject jwtDecode(String token, String algorithm, js.JsObject key) {
-  var obj = js.JsObject(js.context['Object']);
+String jwtEncode(JSObject data, String algorithm, JSObject key) {
+	if (algorithm != 'EdDSA') {
+		throw UnsupportedError(
+			'jwtDecode currently only supports EdDSA algorithm with Ed448 keys',
+		);
+	}
 
-  if (algorithm != "EdDSA") {
-    throw UnsupportedError(
-        "jwtDecode currently only supports EdDSA algorithm with Ed448 keys");
-  }
+	return jwt.jwtEncode(
+		_toDartValue(data),
+		algorithm: algorithm,
+		key: jwt.OkpPrivateKey.fromSecret('Ed448', (key['key'] as JSString).toDart),
+	);
+}
 
-  var jwtKey;
-  if (key.hasProperty("public") && key['public']) {
-    jwtKey = jwt.OkpPublicKey.fromPublic("Ed448", key['key']);
-  } else {
-    jwtKey = jwt.OkpPrivateKey.fromSecret("Ed448", key['key']);
-  }
+JSObject jwtDecode(String token, String algorithm, JSObject key) {
+	final obj = JSObject();
 
-  try {
-    var decoded = jwt.jwtDecode(token, key: jwtKey, algorithm: "EdDSA");
-    obj["verified"] = true;
-    obj["decoded"] = js.JsObject.jsify(decoded);
-    obj["reason"] = null;
-  } catch (e) {
-    obj["verified"] = false;
-    obj["decoded"] = null;
-    if (e is jwt.InvalidToken) {
-      obj["reason"] = e.toString().split(': ')[0];
-    } else if (e is UnsupportedError) {
-      obj["reason"] = e.toString().split(': ')[1];
-    } else {
-      obj["reason"] = "Unable to parse token";
-    }
-  }
+	if (algorithm != 'EdDSA') {
+		throw UnsupportedError(
+			'jwtDecode currently only supports EdDSA algorithm with Ed448 keys',
+		);
+	}
 
-  return obj;
+	final keyValue = (key['key'] as JSString).toDart;
+	final keyIsPublic = key.has('public') && (key['public'] as JSBoolean).toDart;
+
+	final jwtKey = keyIsPublic
+		? jwt.OkpPublicKey.fromPublic('Ed448', keyValue)
+		: jwt.OkpPrivateKey.fromSecret('Ed448', keyValue);
+
+	try {
+		final decoded = jwt.jwtDecode(token, key: jwtKey, algorithm: 'EdDSA');
+		obj['verified'] = true.toJS;
+		obj['decoded'] = decoded.jsify();
+		obj['reason'] = null;
+	} catch (e) {
+		obj['verified'] = false.toJS;
+		obj['decoded'] = null;
+		if (e is jwt.InvalidToken) {
+			obj['reason'] = e.toString().split(': ')[0].toJS;
+		} else if (e is UnsupportedError) {
+			obj['reason'] = e.toString().split(': ')[1].toJS;
+		} else {
+			obj['reason'] = 'Unable to parse token'.toJS;
+		}
+	}
+
+	return obj;
 }
 
 void main() {
-  var thirds = {};
-  thirds['jwtEncode'] = jwtEncode;
-  thirds['jwtDecode'] = jwtDecode;
-
-  var ctx = 'exports';
-  var isBrowser = !js.context.hasProperty('exports');
-  if (isBrowser) {
-    ctx = 'Thirds';
-    js.context[ctx] = js.JsObject(js.context['Object']);
-  }
-  thirds.forEach((key, value) {
-    js.context[ctx][key] = value;
-  });
+	final target = _globalObject();
+	target['jwtEncode'] =
+		((JSObject data, JSString algorithm, JSObject key) =>
+			jwtEncode(data, algorithm.toDart, key).toJS).toJS;
+	target['jwtDecode'] =
+		((JSString token, JSString algorithm, JSObject key) =>
+			jwtDecode(token.toDart, algorithm.toDart, key)).toJS;
 }
