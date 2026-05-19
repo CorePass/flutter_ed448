@@ -88,11 +88,20 @@ dart analyze
 dart test
 dart --enable-asserts run test/all.dart
 dart pub publish --dry-run
-git tag v<version>
-git push origin v<version>
+git tag <version>
+git push origin <version>
 ```
 
-If `flutter_ed448` is being published to pub.dev for the first time, the initial release must still be published manually. After that, the included GitHub Actions release workflow can publish tagged versions automatically once pub.dev automated publishing is configured for this repository.
+After pushing the version tag, publish a GitHub release for the same tag, for example `0.2.0`.
+
+The workflows are split as follows:
+
+- Publishing a GitHub release runs the repository `Release` workflow.
+- Pushing a matching version tag runs the `Publish to pub.dev` workflow.
+
+The pub.dev publish step must stay tag-triggered. Dart's official automated publishing flow only allows GitHub Actions publishing when the workflow was triggered by a pushed git tag, not only by a GitHub release event.
+
+If `flutter_ed448` is being published to pub.dev for the first time, the initial release must still be published manually. After that, automated publishing can be enabled for this repository on pub.dev using the plain version tag pattern `{{version}}`.
 
 ## Licensing
 

@@ -39,9 +39,11 @@ Tagged releases are handled through GitHub Actions.
 Use the current package version from `pubspec.yaml` and create a matching Git tag:
 
 ```sh
-git tag v<version>
-git push origin v<version>
+git tag <version>
+git push origin <version>
 ```
+
+Then publish a GitHub release for the same tag.
 
 If the package name is being published to pub.dev for the first time, the first release must be performed manually before automated publishing can be used.
 
