@@ -12,11 +12,13 @@ The package is pure Dart, so it works in both Dart and Flutter projects.
 ## Installation
 
 With Dart:
+
 ```sh
 dart pub add flutter_ed448
 ```
 
 With Flutter:
+
 ```sh
 flutter pub add flutter_ed448
 ```
@@ -71,7 +73,7 @@ void main() {
 }
 ```
 
-See [test/core_ed448_test.dart](/Users/redqueen/Projects/flutter_ed448/test/core_ed448_test.dart) for compatibility vectors and edge-case coverage.
+See [test/flutter_ed448_test.dart](test/flutter_ed448_test.dart) for compatibility vectors and edge-case coverage.
 
 ## Running Tests
 
@@ -109,4 +111,4 @@ If `flutter_ed448` is being published to pub.dev for the first time, the initial
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](/Users/redqueen/Projects/flutter_ed448/CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](/Users/redqueen/Projects/flutter_ed448/CODE_OF_CONDUCT.md).
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
