@@ -21,6 +21,7 @@ Uint8List _secretScalarForHdPrivateKey(List<int> privateKey) {
   return scalar;
 }
 
+/// Generates a random 57-byte Ed448 private key.
 Uint8List ed448GenerateKey() {
   final privateKey = Uint8List(ed448.KEY_LENGTH);
   final random = Random.secure();
@@ -31,6 +32,7 @@ Uint8List ed448GenerateKey() {
   return privateKey;
 }
 
+/// Derives the public key for [privateKey].
 Uint8List ed448DerivePublicKey(Uint8List privateKey) {
   if (privateKey.length != ed448.KEY_LENGTH) {
     throw FormatException('Bad private key length');
@@ -44,6 +46,7 @@ Uint8List ed448DerivePublicKey(Uint8List privateKey) {
   return _bytes(ed448.secretToPublicFromScalar(scalar));
 }
 
+/// Signs [message] using an Ed448 [privateKey].
 Uint8List ed448Sign(Uint8List privateKey, Uint8List message) {
   if (privateKey.length != ed448.KEY_LENGTH) {
     throw FormatException('Bad private key length');
@@ -57,6 +60,7 @@ Uint8List ed448Sign(Uint8List privateKey, Uint8List message) {
   return _bytes(ed448.signWithScalar(scalar, scalar, message));
 }
 
+/// Verifies an Ed448 [signature] for [message].
 bool ed448Verify(
   Uint8List publicKey,
   Uint8List message,
@@ -65,10 +69,12 @@ bool ed448Verify(
   return ed448.verify(publicKey, message, signature);
 }
 
+/// Derives a public key from an Ed448 scalar.
 Uint8List secretToPublicFromScalar(Uint8List scalar) {
   return _bytes(ed448.secretToPublicFromScalar(scalar));
 }
 
+/// Signs a message using an expanded scalar and nonce prefix.
 Uint8List signWithScalar(
   Uint8List scalar,
   Uint8List noncePrefix,
@@ -77,6 +83,7 @@ Uint8List signWithScalar(
   return _bytes(ed448.signWithScalar(scalar, noncePrefix, message));
 }
 
+/// Derives deterministic Ed448 keys for hierarchical wallets.
 class Ed448HDWallet {
   Uint8List SHA512Hash(Uint8List password, Uint8List salt) {
     final derivator = PBKDF2KeyDerivator(Mac('SHA3-512/HMAC'));
@@ -196,16 +203,20 @@ class Ed448HDWallet {
   }
 }
 
+/// Compatibility entry point for generating an Ed448 private key.
 Uint8List flutterEd448GenerateKey() => ed448GenerateKey();
 
+/// Compatibility entry point for deriving an Ed448 public key.
 Uint8List flutterEd448DerivePublicKey(Uint8List privateKey) {
   return ed448DerivePublicKey(privateKey);
 }
 
+/// Compatibility entry point for signing with Ed448.
 Uint8List flutterEd448Sign(Uint8List privateKey, Uint8List message) {
   return ed448Sign(privateKey, message);
 }
 
+/// Compatibility entry point for verifying an Ed448 signature.
 bool flutterEd448Verify(
   Uint8List publicKey,
   Uint8List message,
