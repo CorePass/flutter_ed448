@@ -1,3 +1,8 @@
+# 0.2.1
+
+- Add API documentation across the public cryptographic interfaces.
+- Resolve strict pub.dev static-analysis findings.
+
 # 0.2.0
 
 - Prepare the package for release as `flutter_ed448`

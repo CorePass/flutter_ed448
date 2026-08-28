@@ -1,0 +1,19 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  errors:
+    annotate_overrides: ignore
+    avoid_relative_lib_imports: ignore
+    camel_case_types: ignore
+    no_leading_underscores_for_local_identifiers: ignore
+    non_constant_identifier_names: ignore
+    prefer_final_fields: ignore
+    prefer_interpolation_to_compose_strings: ignore
+    prefer_is_empty: ignore
+    prefer_is_not_operator: ignore
+    prefer_spread_collections: ignore
+    prefer_typing_uninitialized_variables: ignore
+    strict_top_level_inference: ignore
+    unrelated_type_equality_checks: ignore
+    unnecessary_this: ignore
+    use_super_parameters: ignore

@@ -162,50 +162,62 @@ List<int> _Keccak(int rate, int capacity, List<int> inputBytes,
   return Uint8List.fromList(List<int>.from(outputBytes.map((b) => b.toInt())));
 }
 
+/// Computes a SHAKE128 extendable-output digest.
 List<int> shake_128(List<int> inputBytes, int outputByteLength) {
   return _Keccak(1344, 256, inputBytes, 0x1F, outputByteLength);
 }
 
+/// Computes a SHAKE256 extendable-output digest.
 List<int> shake_256(List<int> inputBytes, int outputByteLength) {
   return _Keccak(1088, 512, inputBytes, 0x1F, outputByteLength);
 }
 
+/// Computes a SHA3-224 digest.
 List<int> sha3_224(List<int> inputBytes) {
   return _Keccak(1152, 448, inputBytes, 0x06, 224 ~/ 8);
 }
 
+/// Computes a SHA3-256 digest.
 List<int> sha3_256(List<int> inputBytes) {
   return _Keccak(1088, 512, inputBytes, 0x06, 256 ~/ 8);
 }
 
+/// Computes a SHA3-384 digest.
 List<int> sha3_384(List<int> inputBytes) {
   return _Keccak(832, 768, inputBytes, 0x06, 384 ~/ 8);
 }
 
+/// Computes a SHA3-512 digest.
 List<int> sha3_512(List<int> inputBytes) {
   return _Keccak(576, 1024, inputBytes, 0x06, 512 ~/ 8);
 }
 
+/// Computes a SHAKE128 digest and returns lowercase hexadecimal text.
 String shake_128Hex(List<int> inputBytes, int outputByteLength) {
   return asHexString(shake_128(inputBytes, outputByteLength));
 }
 
+/// Computes a SHAKE256 digest and returns lowercase hexadecimal text.
 String shake_256Hex(List<int> inputBytes, int outputByteLength) {
   return asHexString(shake_256(inputBytes, outputByteLength));
 }
 
+/// Computes a SHA3-224 digest and returns lowercase hexadecimal text.
 String sha3_224Hex(List<int> inputBytes) {
   return asHexString(sha3_224(inputBytes));
 }
 
+/// Computes a SHA3-256 digest and returns lowercase hexadecimal text.
 String sha3_256Hex(List<int> inputBytes) {
   return asHexString(sha3_256(inputBytes));
 }
 
+/// Computes a SHA3-384 digest and returns lowercase hexadecimal text.
 String sha3_384Hex(List<int> inputBytes) {
   return asHexString(sha3_384(inputBytes));
 }
 
+/// Computes a SHA3-512 digest and returns lowercase hexadecimal text.
 String sha3_512Hex(List<int> inputBytes) {
   return asHexString(sha3_512(inputBytes));
 }

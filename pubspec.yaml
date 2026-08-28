@@ -4,7 +4,7 @@ description: >-
   Flutter-compatible Dart implementations of SHA-3, BLAKE3,
   EdDSA/Ed448, and Ed448 JWT helpers.
 
-version: 0.2.0
+version: 0.2.1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -22,6 +22,7 @@ topics:
 dependencies:
   pointycastle: ^4.0.0
 dev_dependencies:
+  lints: ^6.0.0
   node_preamble: ^2.0.1
   test: ^1.24.0
 
